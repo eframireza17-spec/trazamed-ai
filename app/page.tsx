@@ -26,11 +26,46 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
 const doctors = [
-  { name: "Dra. Valeria Vargas", license: "CED-8291736", specialty: "Medicina interna", hospital: "Hospital General Público" },
-  { name: "Dr. Alejandro Ramírez", license: "CED-5529182", specialty: "Urgencias", hospital: "Hospital General Público" },
-  { name: "Dra. Fernanda López", license: "CED-7712450", specialty: "Pediatría", hospital: "Hospital General Público" },
-  { name: "Dr. Ricardo Torres", license: "CED-6621980", specialty: "Cirugía general", hospital: "Hospital General Público" },
-  { name: "Dra. Mariana Castillo", license: "CED-9044112", specialty: "Farmacología clínica", hospital: "Hospital General Público" },
+  {
+    name: "Dra. Valeria Vargas",
+    license: "CED-8291736",
+    specialty: "Medicina interna",
+    hospital: "Hospital General Público",
+    pin: "1234",
+    role: "Médico",
+  },
+  {
+    name: "Dr. Alejandro Ramírez",
+    license: "CED-5529182",
+    specialty: "Urgencias",
+    hospital: "Hospital General Público",
+    pin: "2222",
+    role: "Urgencias",
+  },
+  {
+    name: "Dra. Fernanda López",
+    license: "CED-7712450",
+    specialty: "Pediatría",
+    hospital: "Hospital General Público",
+    pin: "3333",
+    role: "Pediatría",
+  },
+  {
+    name: "Dr. Ricardo Torres",
+    license: "CED-6621980",
+    specialty: "Cirugía general",
+    hospital: "Hospital General Público",
+    pin: "4444",
+    role: "Cirujano",
+  },
+  {
+    name: "Dra. Mariana Castillo",
+    license: "CED-9044112",
+    specialty: "Farmacología clínica",
+    hospital: "Hospital General Público",
+    pin: "5555",
+    role: "Farmacia",
+  },
 ];
 
 const patients = [
@@ -105,50 +140,152 @@ function StatusBadge({ status }: { status: string }) {
 }
 
 function Login({ onLogin }: any) {
-  const [selectedLicense, setSelectedLicense] = useState(doctors[0].license);
-  const selectedDoctor = doctors.find((doctor) => doctor.license === selectedLicense) || doctors[0];
+  const [selectedLicense, setSelectedLicense] = useState(
+    doctors[0].license
+  );
+
+  const [pin, setPin] = useState("");
+  const [error, setError] = useState("");
+
+  const selectedDoctor =
+    doctors.find(
+      (doctor) => doctor.license === selectedLicense
+    ) || doctors[0];
 
   return (
     <div className="min-h-screen bg-slate-950 p-6 text-white flex items-center justify-center">
       <Card className="w-full max-w-5xl overflow-hidden rounded-[2rem] border-0 shadow-2xl">
         <CardContent className="grid grid-cols-1 md:grid-cols-2 p-0">
+
           <div className="bg-slate-900 p-8 md:p-12 text-white">
             <div className="mb-10 flex items-center gap-3">
-              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white text-slate-900"><Pill /></div>
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white text-slate-900">
+                <Pill />
+              </div>
+
               <div>
-                <h1 className="text-2xl font-bold text-white">TrazaMed AI</h1>
-                <p className="text-sm text-slate-300">Trazabilidad clínica inteligente</p>
+                <h1 className="text-2xl font-bold text-white">
+                  TrazaMed AI
+                </h1>
+
+                <p className="text-sm text-slate-300">
+                  Trazabilidad clínica inteligente
+                </p>
               </div>
             </div>
-            <h2 className="text-4xl font-bold tracking-tight text-white">Control de medicamentos desde la receta hasta farmacia.</h2>
-            <p className="mt-5 text-slate-300 leading-relaxed">Login médico por cédula profesional, receta digital, reserva por 24 horas, confirmación de farmacia, almacén e inventario conectado.</p>
+
+            <h2 className="text-4xl font-bold tracking-tight text-white">
+              Control de medicamentos desde la receta hasta farmacia.
+            </h2>
+
+            <p className="mt-5 text-slate-300 leading-relaxed">
+              Login médico por cédula profesional, receta digital,
+              reserva por 24 horas, confirmación de farmacia,
+              almacén e inventario conectado.
+            </p>
+
             <div className="mt-8 grid gap-3 text-sm">
-              <div className="rounded-2xl bg-white/10 p-4 text-white">Receta vinculada al inventario</div>
-              <div className="rounded-2xl bg-white/10 p-4 text-white">Farmacia confirma recolección</div>
-              <div className="rounded-2xl bg-white/10 p-4 text-white">Almacén registra entradas y altas</div>
+              <div className="rounded-2xl bg-white/10 p-4 text-white">
+                Receta vinculada al inventario
+              </div>
+
+              <div className="rounded-2xl bg-white/10 p-4 text-white">
+                Farmacia confirma recolección
+              </div>
+
+              <div className="rounded-2xl bg-white/10 p-4 text-white">
+                Almacén registra entradas y altas
+              </div>
             </div>
           </div>
 
           <div className="bg-white p-8 md:p-12 text-slate-900">
             <div className="mb-7 flex items-center gap-3">
               <LockKeyhole className="text-slate-500" />
+
               <div>
-                <h3 className="text-2xl font-bold">Inicio de sesión médico</h3>
-                <p className="text-sm text-slate-500">Demo visual para inversionistas</p>
+                <h3 className="text-2xl font-bold">
+                  Inicio de sesión médico
+                </h3>
+
+                <p className="text-sm text-slate-500">
+                  Demo visual para inversionistas
+                </p>
               </div>
             </div>
+
             <div className="space-y-4">
+
               <Field label="Seleccionar médico">
-                <Select value={selectedLicense} onChange={(e) => setSelectedLicense(e.target.value)}>
+                <Select
+                  value={selectedLicense}
+                  onChange={(e) =>
+                    setSelectedLicense(e.target.value)
+                  }
+                >
                   {doctors.map((doctor) => (
-                    <option key={doctor.license} value={doctor.license}>{doctor.name} · {doctor.specialty}</option>
+                    <option
+                      key={doctor.license}
+                      value={doctor.license}
+                    >
+                      {doctor.name} · {doctor.specialty}
+                    </option>
                   ))}
                 </Select>
               </Field>
-              <Field label="Cédula profesional"><Input value={selectedDoctor.license} readOnly /></Field>
-              <Field label="Especialidad"><Input value={selectedDoctor.specialty} readOnly /></Field>
-              <Field label="Institución"><Input value={selectedDoctor.hospital} readOnly /></Field>
-              <Button onClick={() => onLogin(selectedDoctor)} className="w-full rounded-2xl bg-slate-900 py-6 text-base hover:bg-slate-800">Entrar al sistema</Button>
+
+              <Field label="Cédula profesional">
+                <Input
+                  value={selectedDoctor.license}
+                  readOnly
+                />
+              </Field>
+
+              <Field label="Especialidad">
+                <Input
+                  value={selectedDoctor.specialty}
+                  readOnly
+                />
+              </Field>
+
+              <Field label="Institución">
+                <Input
+                  value={selectedDoctor.hospital}
+                  readOnly
+                />
+              </Field>
+
+              <Field label="PIN institucional">
+                <Input
+                  type="password"
+                  placeholder="Ingresa PIN"
+                  value={pin}
+                  onChange={(e) => setPin(e.target.value)}
+                />
+              </Field>
+
+              {error && (
+                <div className="rounded-2xl bg-red-100 px-4 py-3 text-sm font-medium text-red-700">
+                  {error}
+                </div>
+              )}
+
+              <Button
+                onClick={() => {
+                  if (pin !== selectedDoctor.pin) {
+                    setError(
+                      "PIN institucional incorrecto"
+                    );
+                    return;
+                  }
+
+                  setError("");
+                  onLogin(selectedDoctor);
+                }}
+                className="w-full rounded-2xl bg-slate-900 py-6 text-base hover:bg-slate-800"
+              >
+                Entrar al sistema
+              </Button>
             </div>
           </div>
         </CardContent>
@@ -190,16 +327,51 @@ function Sidebar({ active, setActive, doctor }: any) {
   );
 }
 
-function Header({ doctor, logout }: any) {
+function Header({
+  doctor,
+  logout,
+  setActive,
+  active,
+}: any) {
   return (
-    <header className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between mb-6">
-      <div>
-        <p className="text-sm font-medium text-slate-500 flex items-center gap-2"><Hospital size={16} /> Sesión médica activa · {doctor.specialty}</p>
-        <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-slate-900">Control inteligente de medicamentos</h2>
-      </div>
-      <div className="flex items-center gap-3">
-        <div className="rounded-2xl bg-white px-5 py-3 shadow-sm border text-sm"><b>{doctor.name}</b><br /><span className="text-slate-500">{doctor.license}</span></div>
-        <Button onClick={logout} className="rounded-2xl bg-white text-slate-900 hover:bg-slate-100 border px-5 py-6">Cerrar sesión</Button>
+    <header className="flex flex-col gap-4 mb-6">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div>
+          <p className="text-sm font-medium text-slate-500 flex items-center gap-2">
+            <Hospital size={16} />
+            Sesión médica activa · {doctor.specialty}
+          </p>
+
+          <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-slate-900">
+            Control inteligente de medicamentos
+          </h2>
+        </div>
+
+        <div className="flex items-center gap-3 flex-wrap">
+          {active !== "dashboard" && (
+            <Button
+              onClick={() => setActive("dashboard")}
+              className="rounded-2xl bg-slate-900 text-white hover:bg-slate-800 px-5 py-6"
+            >
+              ← Inicio
+            </Button>
+          )}
+
+          <div className="rounded-2xl bg-white px-5 py-3 shadow-sm border text-sm">
+            <b>{doctor.name}</b>
+            <br />
+            <span className="text-slate-500">
+              {doctor.license}
+            </span>
+          </div>
+
+          <Button
+            onClick={logout}
+            className="rounded-2xl bg-white text-slate-900 hover:bg-slate-100 border px-5 py-6"
+          >
+            Cerrar sesión
+          </Button>
+        </div>
       </div>
     </header>
   );
@@ -495,7 +667,12 @@ export default function App() {
       <Sidebar active={active} setActive={setActive} doctor={doctor} />
       <main className="flex-1 p-4 md:p-8 overflow-hidden">
         <div className="md:hidden mb-4 flex items-center justify-between rounded-3xl bg-white p-4 shadow-sm"><div className="flex items-center gap-2 font-bold"><Pill /> TrazaMed AI</div><span className="text-sm text-slate-500">Demo MVP</span></div>
-        <Header doctor={doctor} logout={logout} />
+        <Header
+  doctor={doctor}
+  logout={logout}
+  setActive={setActive}
+  active={active}
+/>
         {views[active]}
       </main>
     </div>
