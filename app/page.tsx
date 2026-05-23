@@ -25,7 +25,35 @@ import {
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
+const INSTITUTIONAL_PIN = "HGP2026";
+
+const areaAccess = [
+  {
+    area: "Administración",
+    pin: "ADM2026",
+    roles: ["Administrador"],
+  },
+  {
+    area: "Área médica",
+    pin: "MED2026",
+    roles: ["Médico", "Urgencias", "Pediatría", "Cirujano"],
+  },
+  {
+    area: "Farmacia y almacén",
+    pin: "FAR2026",
+    roles: ["Farmacia"],
+  },
+];
+
 const doctors = [
+  {
+    name: "Admin General",
+    license: "ADM-0001",
+    specialty: "Administración hospitalaria",
+    hospital: "Hospital General Público",
+    pin: "0000",
+    role: "Administrador",
+  },
   {
     name: "Dra. Valeria Vargas",
     license: "CED-8291736",
@@ -140,23 +168,36 @@ function StatusBadge({ status }: { status: string }) {
 }
 
 function Login({ onLogin }: any) {
-  const [selectedLicense, setSelectedLicense] = useState(
-    doctors[0].license
-  );
-
+  const [step, setStep] = useState("institution");
+  const [institutionPin, setInstitutionPin] = useState("");
+  const [selectedAreaName, setSelectedAreaName] = useState(areaAccess[0].area);
+  const [areaPin, setAreaPin] = useState("");
+  const [selectedLicense, setSelectedLicense] = useState("");
   const [pin, setPin] = useState("");
   const [error, setError] = useState("");
 
+  const selectedArea =
+    areaAccess.find((area) => area.area === selectedAreaName) || areaAccess[0];
+
+  const allowedDoctors = doctors.filter((doctor) =>
+    selectedArea.roles.includes(doctor.role)
+  );
+
   const selectedDoctor =
-    doctors.find(
-      (doctor) => doctor.license === selectedLicense
-    ) || doctors[0];
+    allowedDoctors.find((doctor) => doctor.license === selectedLicense) ||
+    allowedDoctors[0];
+
+  const goToPersonalLogin = () => {
+    setSelectedLicense(allowedDoctors[0]?.license || "");
+    setPin("");
+    setError("");
+    setStep("personal");
+  };
 
   return (
     <div className="min-h-screen bg-slate-950 p-6 text-white flex items-center justify-center">
       <Card className="w-full max-w-5xl overflow-hidden rounded-[2rem] border-0 shadow-2xl">
         <CardContent className="grid grid-cols-1 md:grid-cols-2 p-0">
-
           <div className="bg-slate-900 p-8 md:p-12 text-white">
             <div className="mb-10 flex items-center gap-3">
               <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white text-slate-900">
@@ -179,114 +220,266 @@ function Login({ onLogin }: any) {
             </h2>
 
             <p className="mt-5 text-slate-300 leading-relaxed">
-              Login médico por cédula profesional, receta digital,
-              reserva por 24 horas, confirmación de farmacia,
-              almacén e inventario conectado.
+              Acceso institucional, validación por área, PIN personal,
+              receta digital, farmacia, almacén, inventario y trazabilidad.
             </p>
 
             <div className="mt-8 grid gap-3 text-sm">
               <div className="rounded-2xl bg-white/10 p-4 text-white">
-                Receta vinculada al inventario
+                1. NIP institucional general
               </div>
 
               <div className="rounded-2xl bg-white/10 p-4 text-white">
-                Farmacia confirma recolección
+                2. NIP por área hospitalaria
               </div>
 
               <div className="rounded-2xl bg-white/10 p-4 text-white">
-                Almacén registra entradas y altas
+                3. Login personal por cédula y PIN
               </div>
             </div>
           </div>
 
           <div className="bg-white p-8 md:p-12 text-slate-900">
-            <div className="mb-7 flex items-center gap-3">
-              <LockKeyhole className="text-slate-500" />
+            {step === "institution" && (
+              <>
+                <div className="mb-7 flex items-center gap-3">
+                  <ShieldCheck className="text-slate-500" />
 
-              <div>
-                <h3 className="text-2xl font-bold">
-                  Inicio de sesión médico
-                </h3>
+                  <div>
+                    <h3 className="text-2xl font-bold">
+                      Acceso institucional
+                    </h3>
 
-                <p className="text-sm text-slate-500">
-                  Demo visual para inversionistas
-                </p>
-              </div>
-            </div>
-
-            <div className="space-y-4">
-
-              <Field label="Seleccionar médico">
-                <Select
-                  value={selectedLicense}
-                  onChange={(e) =>
-                    setSelectedLicense(e.target.value)
-                  }
-                >
-                  {doctors.map((doctor) => (
-                    <option
-                      key={doctor.license}
-                      value={doctor.license}
-                    >
-                      {doctor.name} · {doctor.specialty}
-                    </option>
-                  ))}
-                </Select>
-              </Field>
-
-              <Field label="Cédula profesional">
-                <Input
-                  value={selectedDoctor.license}
-                  readOnly
-                />
-              </Field>
-
-              <Field label="Especialidad">
-                <Input
-                  value={selectedDoctor.specialty}
-                  readOnly
-                />
-              </Field>
-
-              <Field label="Institución">
-                <Input
-                  value={selectedDoctor.hospital}
-                  readOnly
-                />
-              </Field>
-
-              <Field label="PIN institucional">
-                <Input
-                  type="password"
-                  placeholder="Ingresa PIN"
-                  value={pin}
-                  onChange={(e) => setPin(e.target.value)}
-                />
-              </Field>
-
-              {error && (
-                <div className="rounded-2xl bg-red-100 px-4 py-3 text-sm font-medium text-red-700">
-                  {error}
+                    <p className="text-sm text-slate-500">
+                      Primer nivel de seguridad hospitalaria
+                    </p>
+                  </div>
                 </div>
-              )}
 
-              <Button
-                onClick={() => {
-                  if (pin !== selectedDoctor.pin) {
-                    setError(
-                      "PIN institucional incorrecto"
-                    );
-                    return;
-                  }
+                <div className="space-y-4">
+                  <Field label="NIP institucional">
+                    <Input
+                      type="password"
+                      placeholder="Ingresa NIP institucional"
+                      value={institutionPin}
+                      onChange={(e) => setInstitutionPin(e.target.value)}
+                    />
+                  </Field>
 
-                  setError("");
-                  onLogin(selectedDoctor);
-                }}
-                className="w-full rounded-2xl bg-slate-900 py-6 text-base hover:bg-slate-800"
-              >
-                Entrar al sistema
-              </Button>
-            </div>
+                  {error && (
+                    <div className="rounded-2xl bg-red-100 px-4 py-3 text-sm font-medium text-red-700">
+                      {error}
+                    </div>
+                  )}
+
+                  <Button
+                    onClick={() => {
+                      if (institutionPin !== INSTITUTIONAL_PIN) {
+                        setError("NIP institucional incorrecto");
+                        return;
+                      }
+
+                      setError("");
+                      setStep("area");
+                    }}
+                    className="w-full rounded-2xl bg-slate-900 py-6 text-base hover:bg-slate-800"
+                  >
+                    Validar acceso institucional
+                  </Button>
+
+                  <div className="rounded-2xl bg-slate-100 p-4 text-sm text-slate-600">
+                    Demo: <b>{INSTITUTIONAL_PIN}</b>
+                  </div>
+                </div>
+              </>
+            )}
+
+            {step === "area" && (
+              <>
+                <div className="mb-7 flex items-center gap-3">
+                  <Hospital className="text-slate-500" />
+
+                  <div>
+                    <h3 className="text-2xl font-bold">
+                      Acceso por área
+                    </h3>
+
+                    <p className="text-sm text-slate-500">
+                      Segundo nivel de validación interna
+                    </p>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <Field label="Seleccionar área">
+                    <Select
+                      value={selectedAreaName}
+                      onChange={(e) => {
+                        setSelectedAreaName(e.target.value);
+                        setAreaPin("");
+                        setError("");
+                      }}
+                    >
+                      {areaAccess.map((area) => (
+                        <option key={area.area} value={area.area}>
+                          {area.area}
+                        </option>
+                      ))}
+                    </Select>
+                  </Field>
+
+                  <Field label="NIP del área">
+                    <Input
+                      type="password"
+                      placeholder="Ingresa NIP del área"
+                      value={areaPin}
+                      onChange={(e) => setAreaPin(e.target.value)}
+                    />
+                  </Field>
+
+                  {error && (
+                    <div className="rounded-2xl bg-red-100 px-4 py-3 text-sm font-medium text-red-700">
+                      {error}
+                    </div>
+                  )}
+
+                  <Button
+                    onClick={() => {
+                      if (areaPin !== selectedArea.pin) {
+                        setError("NIP de área incorrecto");
+                        return;
+                      }
+
+                      goToPersonalLogin();
+                    }}
+                    className="w-full rounded-2xl bg-slate-900 py-6 text-base hover:bg-slate-800"
+                  >
+                    Continuar a login personal
+                  </Button>
+
+                  <Button
+                    onClick={() => {
+                      setStep("institution");
+                      setAreaPin("");
+                      setError("");
+                    }}
+                    className="w-full rounded-2xl bg-white py-6 text-base text-slate-900 hover:bg-slate-100 border"
+                  >
+                    ← Regresar al NIP institucional
+                  </Button>
+
+                  <div className="rounded-2xl bg-slate-100 p-4 text-sm text-slate-600">
+                    Demo {selectedArea.area}: <b>{selectedArea.pin}</b>
+                  </div>
+                </div>
+              </>
+            )}
+
+            {step === "personal" && (
+              <>
+                <div className="mb-7 flex items-center gap-3">
+                  <LockKeyhole className="text-slate-500" />
+
+                  <div>
+                    <h3 className="text-2xl font-bold">
+                      Inicio de sesión personal
+                    </h3>
+
+                    <p className="text-sm text-slate-500">
+                      Área autorizada: {selectedArea.area}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <Field label="Seleccionar usuario">
+                    <Select
+                      value={selectedLicense}
+                      onChange={(e) => {
+                        setSelectedLicense(e.target.value);
+                        setPin("");
+                        setError("");
+                      }}
+                    >
+                      {allowedDoctors.map((doctor) => (
+                        <option
+                          key={doctor.license}
+                          value={doctor.license}
+                        >
+                          {doctor.name} · {doctor.specialty}
+                        </option>
+                      ))}
+                    </Select>
+                  </Field>
+
+                  <Field label="Cédula profesional / ID">
+                    <Input
+                      value={selectedDoctor?.license || ""}
+                      readOnly
+                    />
+                  </Field>
+
+                  <Field label="Especialidad">
+                    <Input
+                      value={selectedDoctor?.specialty || ""}
+                      readOnly
+                    />
+                  </Field>
+
+                  <Field label="Institución">
+                    <Input
+                      value={selectedDoctor?.hospital || ""}
+                      readOnly
+                    />
+                  </Field>
+
+                  <Field label="PIN personal">
+                    <Input
+                      type="password"
+                      placeholder="Ingresa PIN personal"
+                      value={pin}
+                      onChange={(e) => setPin(e.target.value)}
+                    />
+                  </Field>
+
+                  {error && (
+                    <div className="rounded-2xl bg-red-100 px-4 py-3 text-sm font-medium text-red-700">
+                      {error}
+                    </div>
+                  )}
+
+                  <Button
+                    onClick={() => {
+                      if (!selectedDoctor || pin !== selectedDoctor.pin) {
+                        setError("PIN personal incorrecto");
+                        return;
+                      }
+
+                      setError("");
+                      onLogin(selectedDoctor);
+                    }}
+                    className="w-full rounded-2xl bg-slate-900 py-6 text-base hover:bg-slate-800"
+                  >
+                    Entrar al sistema
+                  </Button>
+
+                  <Button
+                    onClick={() => {
+                      setStep("area");
+                      setPin("");
+                      setError("");
+                    }}
+                    className="w-full rounded-2xl bg-white py-6 text-base text-slate-900 hover:bg-slate-100 border"
+                  >
+                    ← Regresar a selección de área
+                  </Button>
+
+                  <div className="rounded-2xl bg-slate-100 p-4 text-sm text-slate-600">
+                    PIN demo: <b>{selectedDoctor?.pin}</b>
+                  </div>
+                </div>
+              </>
+            )}
           </div>
         </CardContent>
       </Card>
@@ -320,7 +513,7 @@ function Sidebar({ active, setActive, doctor }: any) {
         ))}
       </nav>
       <div className="mt-auto rounded-3xl bg-slate-100 p-4">
-        <div className="flex items-center gap-2 font-semibold text-slate-800"><ShieldCheck size={18} /> Médico verificado</div>
+        <div className="flex items-center gap-2 font-semibold text-slate-800"><ShieldCheck size={18} /> Usuario verificado</div>
         <p className="mt-2 text-sm text-slate-500">{doctor.name}<br />{doctor.license}<br />{doctor.specialty}</p>
       </div>
     </aside>
@@ -339,7 +532,7 @@ function Header({
         <div>
           <p className="text-sm font-medium text-slate-500 flex items-center gap-2">
             <Hospital size={16} />
-            Sesión médica activa · {doctor.specialty}
+            Sesión activa · {doctor.specialty}
           </p>
 
           <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-slate-900">
@@ -649,7 +842,11 @@ export default function App() {
   const [movements, setMovements] = useState(initialMovements);
 
   if (!doctor) return <Login onLogin={setDoctor} />;
-  const logout = () => { setDoctor(null); setActive("dashboard"); };
+
+  const logout = () => {
+    setDoctor(null);
+    setActive("dashboard");
+  };
 
   const views: any = {
     dashboard: <Dashboard setActive={setActive} inventory={inventory} movements={movements} />,
@@ -666,13 +863,18 @@ export default function App() {
     <div className="min-h-screen bg-slate-50 text-slate-900 flex">
       <Sidebar active={active} setActive={setActive} doctor={doctor} />
       <main className="flex-1 p-4 md:p-8 overflow-hidden">
-        <div className="md:hidden mb-4 flex items-center justify-between rounded-3xl bg-white p-4 shadow-sm"><div className="flex items-center gap-2 font-bold"><Pill /> TrazaMed AI</div><span className="text-sm text-slate-500">Demo MVP</span></div>
+        <div className="md:hidden mb-4 flex items-center justify-between rounded-3xl bg-white p-4 shadow-sm">
+          <div className="flex items-center gap-2 font-bold"><Pill /> TrazaMed AI</div>
+          <span className="text-sm text-slate-500">Demo MVP</span>
+        </div>
+
         <Header
-  doctor={doctor}
-  logout={logout}
-  setActive={setActive}
-  active={active}
-/>
+          doctor={doctor}
+          logout={logout}
+          setActive={setActive}
+          active={active}
+        />
+
         {views[active]}
       </main>
     </div>
